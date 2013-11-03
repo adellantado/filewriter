@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!--<script src="test.js"></script>-->
+</head>
+<body onload="start()">
+<script type="text/javascript">
+	function start() {
+
+        var worker = new Worker("writer/worker.js");
+
+        worker.addEventListener('message', function(e) {
+            console.log('Worker said: ', e.data);
+        }, false);
+
+        window.navigator.webkitPersistentStorage.requestQuota(10*1024*1024,
+                function(quota) {
+                    //log.info("File system quota has been got. size={1}", quota);
+                    worker.postMessage("init");
+                });
+
+
+        this.run = function(command, args) {
+            worker.postMessage({run: 1, command: command, args: args});
+        }
+
+
+	}
+</script>
+</body>
+</html> 
