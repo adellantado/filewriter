@@ -3,18 +3,17 @@ self.addEventListener('message', function(e) {
     if (data == "init") {
         callFileSystem();
     } else if (data.run) {
-        log.info(data.command + ": " + writer[data.command].apply(this, data.args));
+        log.info(data.command + ": " + self.writer[data.command].apply(this, data.args));
     } else {
         self.postMessage({get: data});
     }
 }, false);
 
 importScripts('logger/logger.js');
-importScripts('logger/targets/WorkerTarget.js');
 importScripts('writer.js');
 
 
-var log = new Log(true, new WorkerTarget(0));
+var log = new Log(true, new WorkerTarget(0, true, true));
 
 self.requestFileSystemSync = self.requestFileSystemSync || self.webkitRequestFileSystemSync;
 

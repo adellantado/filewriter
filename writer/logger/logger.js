@@ -16,7 +16,7 @@ function Log(active, target) {
     var active = active;
     var targets = [];
 
-    if (target) {
+    if (target instanceof Target) {
         targets.push(target);
     }
 
@@ -41,7 +41,9 @@ function Log(active, target) {
     }
 
     this.addTarget = function(target) {
-        targets.push(target);
+        if (target instanceof Target) {
+            targets.push(target);
+        }
     }
 
     this.removeTarget = function(target) {
@@ -95,6 +97,58 @@ function Log(active, target) {
         });
     }
 
+}
 
+this.Target = function(level, includeTime, includeLevel) {
+
+    this.log = function(message) {
+        //
+    }
+
+    this.isSupported = function() {
+        //
+    }
+
+    this.level = level;
+    this.includeTime = includeTime;
+    this.includeLevel = includeLevel;
+
+}
+
+this.WorkerTarget = function(level, includeTime, includeLevel) {
+    var self = this;
+    this.__proto__ = new Target();
+    Target.call(this, level, includeTime, includeLevel);
+
+    this.log = function(message) {
+        self.__proto__.log(message);
+        postMessage({log: message});
+    }
+
+    this.isSupported = function() {
+        self.__proto__.isSupported();
+        if (!postMessage) {
+            throw new Error("Worker target unsupported");
+        }
+    }();
+
+}
+
+this.ConsoleTarget = function(level, includeTime, includeLevel) {
+    var self = this;
+    this.__proto__ = new Target();
+    Target.call(this, level, includeTime, includeLevel);
+
+    this.log = function(message) {
+        self.__proto__.log(message);
+        console.log(message);
+    }
+
+    this.isSupported = function() {
+        self.__proto__.isSupported();
+        if (!console) {
+            throw new Error("Console target unsupported");
+        }
+    }();
 
 }

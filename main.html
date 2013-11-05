@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<!--<script src="test.js"></script>-->
+	<script src="writer/logger/logger.js"></script>
 </head>
 <body onload="start()">
 <script type="text/javascript">
 	function start() {
+
+        var log = new Log(true, new ConsoleTarget(0, true, true));
+        log.info("Test log");
 
         var worker = new Worker("writer/worker.js");
 
