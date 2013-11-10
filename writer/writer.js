@@ -1,8 +1,9 @@
-
-
-// Bone
-
-this.Writer = function(rootEntry) {
+/**
+ * Base commands to work with filesystem
+ * @param fileSystem
+ * @constructor
+ */
+this.Writer = function(fileSystem) {
 
 const MOVE_BACK = "..";
 
@@ -11,10 +12,12 @@ const MOVE_BACK = "..";
 */
 this.separator = "/";
 
+var fileSystem = fileSystem;
+
 /**
 * @default root
 */
-var currentEntry = rootEntry;
+var currentEntry = fileSystem.rootEntry;
 
 var savedPositions = [];
 
@@ -107,11 +110,16 @@ this.cp = function(name, path) {
     return fileEntry.name;
 }
 
-this.mv = function(name1, name2) {
-    name2 = name2 || name1;
+this.mv = function(name1, fullpath) {
+    var res = parseFullPath(fullpath)
+    var name2 = res.file;
+    var path = res.path;
     var entry = currentEntry.getFile(name1, {create: false});
+    safePosition();
+    cd(path);
     var fileEntry = entry.moveTo(currentEntry, name2);
-    return fileEntry.name;
+    restorePosition();
+    return name2;
 }
 
 this.mkfile = function(name, data) {
@@ -152,18 +160,21 @@ function restorePosition() {
 	currentEntry = savedPositions.pop();
 }
 
+
+function parseFullPath(fullpath) {
+    var filename = fullpath.replace(/^.*[\\\/]/, '');
+    var path = fullpath.substring(0, fullpath.indexOf(filename));
+    return {path: path, file: filename};
+}
+
 function parsePath(path) {
 	var folders = path.split(this.separator);
 	for (var i = 0; i < folders.length; i++) {
         if (folders[i] === "" || folders[i] === " ") {
-            folders = folders.splice(i--, 1);
+            folders.splice(i--, 1);
         }
     }
 	return folders;
-}
-
-function parseFile() {
-    return path.split(this.separator)[-1];
 }
 
 }

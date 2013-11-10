@@ -16,6 +16,9 @@ importScripts('writer.js');
 var log = new Log(true, new WorkerTarget(0, true, true));
 
 self.requestFileSystemSync = self.requestFileSystemSync || self.webkitRequestFileSystemSync;
+if (!self.requestFileSystemSync) {
+    throw new Error("FileSystem API not supported");
+}
 
 
 self.size = 5*1024*1024;
@@ -62,7 +65,7 @@ function errorHandler(e) {
 }
 
 function test() {
-    var writer = new Writer(self.fileSystem.root);
+    var writer = new Writer(self.fileSystem);
     /*log.info("pwd: "+writer.pwd());
     log.info("mkdir-cd: "+writer.cd(writer.mkdir("asd1")));
     log.info("mkdir-cd: "+writer.cd(writer.mkdir("asd2")));
